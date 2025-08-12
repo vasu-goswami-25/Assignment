@@ -1,1 +1,38 @@
-solution
+import json
+from datetime import datetime
+
+# IMPLEMENT: convert ISO timestamp to milliseconds
+def iso_to_millis(iso_str):
+    """
+    Convert ISO 8601 timestamp (e.g., '2025-08-12T15:30:45Z')
+    to milliseconds since epoch (UTC).
+    """
+    # Replace Z with +00:00 for UTC
+    dt = datetime.fromisoformat(iso_str.replace("Z", "+00:00"))
+    return int(dt.timestamp() * 1000)
+
+# IMPLEMENT: unify the message format
+def unify_message(msg):
+    """
+    Convert message dict from either data-1.json or data-2.json
+    into the target format shown in data-result.json.
+    """
+    return {
+        "id": msg.get("id") or msg.get("messageId"),
+        "sender": msg.get("from") or msg.get("sender"),
+        "receiver": msg.get("to") or msg.get("receiver"),
+        "message": msg.get("text") or msg.get("message"),
+        "timestamp": (
+            msg["timestamp"]
+            if isinstance(msg["timestamp"], int)
+            else iso_to_millis(msg["timestamp"])
+        )
+    }
+
+# Optional: quick manual check (will not interfere with auto tests)
+if __name__ == "__main__":
+    with open("data-1.json") as f1, open("data-2.json") as f2:
+        d1 = json.load(f1)
+        d2 = json.load(f2)
+    print(unify_message(d1))
+    print(unify_message(d2))
